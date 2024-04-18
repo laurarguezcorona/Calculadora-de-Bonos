@@ -1,0 +1,75 @@
+---
+title: "Calculadora de Bonos"
+author: "Laura Rodríguez Corona"
+date: "2024-04-18"
+output: html_document
+---
+
+
+```{r}
+# Función para calcular el precio limpio de un bono M (tasa cupón fija)
+calcular_precio_limipo_bono <- function(fecha_emision, fecha_vencimiento, fecha_valuacion, valor_nominal, tasa_cupon_anual, periodicidad_cupon, tasa_mercado) {
+  
+  # Convertir las fechas a objetos de fecha
+  fecha_emision <- as.Date(fecha_emision)
+  fecha_vencimiento <- as.Date(fecha_vencimiento)
+  fecha_valuacion <- as.Date(fecha_valuacion)
+  
+  # Calcular el número total de períodos de pago de cupones
+  periodos_cupones <- difftime(fecha_vencimiento, fecha_emision, units = "days")
+  periodos_cupones <- as.numeric(periodos_cupones) / 365  # Convertir a años
+  
+  # Determinar la cantidad de días restantes hasta el vencimiento del bono
+  dias_restantes_vencimiento <- difftime(fecha_vencimiento, fecha_valuacion, units = "days")
+  dias_restantes_vencimiento <- as.numeric(dias_restantes_vencimiento)
+  
+  # Calcular la tasa de interés por período (ajustada a la periodicidad de cupón)
+  tasa_cupon_periodo <- tasa_cupon_anual / periodicidad_cupon
+  
+  # Calcular el valor presente de cada cupón utilizando la fórmula del valor presente
+  cupon_presente <- valor_nominal * tasa_cupon_periodo * (1 - (1 + tasa_cupon_periodo)^(-periodos_cupones)) / tasa_cupon_periodo
+  
+  # Calcular el valor presente del valor nominal
+  valor_nominal_presente <- valor_nominal / (1 + tasa_mercado)^(dias_restantes_vencimiento / 365)
+  
+  # Calcular el precio limpio del bono sumando los valores presentes de todos los flujos de efectivo futuros
+  precio_limpo <- cupon_presente + valor_nominal_presente
+  
+  # Retornar el precio limpio del bono
+  return(precio_limpo)
+}
+
+# Ejemplo de uso de la función con los parámetros proporcionados
+fecha_emision <- "2024-03-10"
+fecha_vencimiento <- "2027-03-10"
+fecha_valuacion <- "2024-03-10"
+valor_nominal <- 100
+tasa_cupon_anual <- 0.10
+periodicidad_cupon <- 2  # Semestral
+tasa_mercado <- 0.08
+
+precio_limpo_bono <- calcular_precio_limipo_bono(fecha_emision, fecha_vencimiento, fecha_valuacion, valor_nominal, tasa_cupon_anual, periodicidad_cupon, tasa_mercado)
+
+print(precio_limpo_bono)
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
